@@ -1,10 +1,9 @@
 const policyList = {
     superAdminPolicy: ['superAdmin'],
     adminPolicy: ['superAdmin', 'admin'],
-    managerPolicy: ['superAdmin', 'admin', 'manager'],
-    librarianPolicy: ['superAdmin', 'admin', 'manager', 'librarian'],
-    publicPolicy: ['superAdmin', 'admin', 'manager', 'librarian', 'user'],
-    userPolicy: ['superAdmin', 'admin', 'user']
+    studentPolicy: ['superAdmin', 'admin', 'student'],
+    teacherPolicy: ['superAdmin', 'admin', 'teacher'],
+    publicPolicy: ['superAdmin', 'admin', 'manager', 'student', 'teacher'],
 }
 
 export default policyList;

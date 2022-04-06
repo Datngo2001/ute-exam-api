@@ -9,11 +9,10 @@ roles.createMany({
     data: [
         { name: 'superAdmin' },
         { name: 'admin' },
-        { name: 'manager' },
-        { name: 'librarian' },
-        { name: 'user' },
+        { name: 'student' },
+        { name: 'teacher' },
     ]
-}).then((roles) => {  
+}).then((roles) => {
     hash("datngo123", 10).then((val) => {
         users.create({
             data: {
