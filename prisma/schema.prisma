@@ -42,3 +42,24 @@ model Role {
   isActive  Boolean  @default(true)
   User      User[]
 }
+
+model Test {
+  testcode String @unique @id
+  name String
+  createAt DateTime @default(now())
+  question Question[]
+}
+model Question{
+  id        Int      @id @default(autoincrement())
+  testcode String
+  title String
+  correctAnswer String
+  test Test @relation(fields: [testcode],references: [testcode])
+  answerList AnswerList[]
+}
+model AnswerList{
+  id Int @id @default(autoincrement())
+  answer String
+  question Question     @relation(fields: [questionID], references: [id])
+  questionID Int
+}
