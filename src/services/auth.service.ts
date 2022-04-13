@@ -1,7 +1,7 @@
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { SECRET_KEY } from '@config';
-import { CreateUserDto, LoginDto, SignupDto } from '@dtos/users.dto';
+import { LoginDto, SignupDto } from '@dtos/users.dto';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, TokenData } from '@interfaces/auth.interface';
 import { isEmpty } from '@utils/util';
@@ -19,7 +19,19 @@ class AuthService {
     if (findUser) throw new HttpException(409, `You're username ${userData.username} already exists`);
 
     const hashedPassword = await hash(userData.password, 10);
-    const createUserData: Promise<User> = this.users.create({ data: { ...userData, password: hashedPassword, roleName: this.defaultRole } });
+    const createUserData: Promise<User> = this.users.create({
+      data: {
+        username: userData.username,
+        password: hashedPassword,
+        roleName: userData.roleName,
+        profile: {
+          create: {
+            fname: userData.fname,
+            lname: userData.lname
+          }
+        }
+      }
+    });
 
     return createUserData;
   }

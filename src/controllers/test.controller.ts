@@ -1,36 +1,41 @@
-import { Controller, Param, Body, Get, Post, Put, Delete,Req, HttpCode, UseBefore } from 'routing-controllers';
-import { OpenAPI } from 'routing-controllers-openapi';
-import { CreateQuestionDto, CreateTestDto } from '@/dtos/test.dto';
+import { Response } from 'express';
+import { Controller, Req, Body, Post, UseBefore, HttpCode, Res, Get, Param } from 'routing-controllers';
+import { CreateUserDto, LoginDto, SignupDto } from '@dtos/users.dto';
 import { RequestWithUser } from '@interfaces/auth.interface';
-import { Test, User } from '@prisma/client';
-import testService from '@services/test.servies';
+import authMiddleware from '@middlewares/auth.middleware';
 import { validationMiddleware } from '@middlewares/validation.middleware';
-import authMiddleware from '@/middlewares/auth.middleware';
+import AuthService from '@services/auth.service';
+import { Test, User } from '@prisma/client';
 import policyList from '@/policies';
-import userService from '@/services/users.service';
+import TestService from '@/services/test.service';
+import { OpenAPI } from 'routing-controllers-openapi';
+import { CreateTestDto } from '@/dtos/tests.dto';
 
 @Controller('/api')
-export class TestsController {
-  public testService = new testService();
-  public userService = new userService();
+export class TestController {
+    public testService = new TestService();
 
-  @Get('/tests/:testcode')
-  @UseBefore(authMiddleware(policyList.adminPolicy))
-  @OpenAPI({ summary: 'Return find a test' })
-  async findTestbycode(@Param('testcode') testCode: string) {
-    const findOneUserData: Test = await this.testService.findTestbycode(testCode);
-    return { data: findOneUserData, message: 'findOne' };
-  }
+    @Get('/tests')
+    @UseBefore(authMiddleware(policyList.teacherPolicy))
+    @OpenAPI({ summary: 'Return a list of tests for teacher' })
+    async getTests(@Req() req: RequestWithUser) {
+        const testList: Test[] = await this.testService.GetTestList(req.user.id);
+        return { data: testList, message: 'list' };
+    }
 
-  @Post('/:users/tests')
-  @HttpCode(201)
-  @UseBefore(authMiddleware(policyList.adminPolicy))
-  @UseBefore(validationMiddleware(CreateTestDto, 'body'))
-  @OpenAPI({ summary: 'Create a new test' })
-  async createTest(@Req() req: RequestWithUser, @Body() userData: CreateTestDto) {
-    const user: User = req.user;
-    const createUserData: Test = await this.testService.createTest( user.username,userData);
-    return { data: createUserData, message: 'created' };
-  }
+    @Get('/tests/:id')
+    @OpenAPI({ summary: 'Return test for student' })
+    async getTestById(@Param('id') testId: number) {
+        const test: Test = await this.testService.GetTest(testId);
+        return { data: test, message: 'test' };
+    }
 
+    @Post('/tests')
+    @UseBefore(validationMiddleware(CreateTestDto, 'body'))
+    @UseBefore(authMiddleware(policyList.teacherPolicy))
+    @HttpCode(201)
+    async create(@Req() req: RequestWithUser, @Body() testData: CreateTestDto) {
+        const createTestData: Test = await this.testService.CreateTest(testData, req.user.id);
+        return { id: createTestData.id, message: 'create' };
+    }
 }

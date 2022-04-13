@@ -14,6 +14,15 @@ export class SignupDto {
 
   @IsString()
   public password: string;
+
+  @IsString()
+  public roleName: string;
+
+  @IsString()
+  public fname: string;
+
+  @IsString()
+  public lname: string;
 }
 
 export class CreateUserDto {
